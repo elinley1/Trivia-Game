@@ -1,63 +1,66 @@
 const $ = jQuery;
 const timerInit = 5;
-
-var GameState = {
-    questions: [{
-        qNumber: "1",
-        q: "'Teep trong' in English refers to: ",
-        answers: ["A straight foot-thrust.", "A slapping foot-thrust.", "A straight kick.", "A roundhouse kick."],
-        correctAns: 0,
-    }, {
-        qNumber: "2",
-        q: "A 'jab' in Thai is called: ",
-        answers: ["'Mat na'", "'Mat trong'", "'Mat wiang san'", "'Krodot chok'"],
-        correctAns: 0,
-    }, {
-        qNumber: "3",
-        q: "A clinch, or 'chap-kho', variant, the Swan-neck involves: ",
-        answers: ["Putting both controlling arms passed under the defender's arms.", "A defender's soft parries to change the direction of a strike so that it misses the target.", "One hand around the rear of the neck to briefly clinch an opponent before a strike.", "Swimming the arm underneath and inside the oponenet's clinch."],
-        correctAns: 2,
-    }, {
-        qNumber: "4",
-        q: "'Wai Kru' is: ",
-        answers: ["A horizontal knee strike.", "A defender's hard blocks to stop a strike in its path and prevent it from reaching the target.", "A traditional pre-fight dance to pay respects to teachers, ancestors, and the spectators."],
-        correctAns: 3,
-    }, {
-        qNumber: "5",
-        q: "'Sok ti' in English is known as: ",
-        answers: ["Spinning elbow", "Elbow slash", "Uppercut", "Roundhouse kick"],
-        correctAns: 1,
-    }, {
-        qNumber: "6",
-        q: "A jumping knee strike in Thai is known as: ",
-        answers: ["'Khayoep teh'", "'Khao dot'", "'Teh tat'", "'Sok tat'", "'Sok klap'"],
-        correctAns: 1,
-    }, {
-        qNumber: "7",
-        q: "The Thai king who codified the modern rules for Muay Thai was: ",
-        answers: ["King Chulalongkorn", "King Naresuan", "King Rama", "King Mangra"],
-        correctAns: 2,
-    }, {
-        qNumber: "8",
-        q: "Muay Thai is often known as: ",
-        answers: ["The way of kicking and jumping, and the fist and hand", "The way of harmonious spirit", "The way of coordinating power", "The art of eight-limbs"],
-        correctAns: 3,
-    }, {
-        qNumber: "9",
-        q: "'Mat wiang klap' in English is a: ",
-        answers: ["Spinning backfist", "Spinning elbow", "Double elow chop", "Superman punch"],
-        correctAns: 0,
-        timerOn: false
-    }
-    ],
-    timer: timerInit,
-    correctCount: 0,
-    wrongCount: 0,
-    userAns: null,
-    answerDisplay: "",
-    display: "INIT", // INIT / QUESTION / INCORRECT / CORRECT / TIMEUP
-    questionIndex: 0
-};
+function makeInitialGameState() {
+    return {
+        questions: [{
+            qNumber: "1",
+            q: "'Teep trong' in English refers to: ",
+            answers: ["A straight foot-thrust.", "A slapping foot-thrust.", "A straight kick.", "A roundhouse kick."],
+            correctAns: 0,
+        }, {
+            qNumber: "2",
+            q: "A 'jab' in Thai is called: ",
+            answers: ["'Mat na'", "'Mat trong'", "'Mat wiang san'", "'Krodot chok'"],
+            correctAns: 0,
+        }, {
+            qNumber: "3",
+            q: "A clinch, or 'chap-kho', variant, the Swan-neck involves: ",
+            answers: ["Putting both controlling arms passed under the defender's arms.", "A defender's soft parries to change the direction of a strike so that it misses the target.", "One hand around the rear of the neck to briefly clinch an opponent before a strike.", "Swimming the arm underneath and inside the oponenet's clinch."],
+            correctAns: 2,
+        }, {
+            qNumber: "4",
+            q: "'Wai Kru' is: ",
+            answers: ["A horizontal knee strike.", "A defender's hard blocks to stop a strike in its path and prevent it from reaching the target.", "A traditional pre-fight dance to pay respects to teachers, ancestors, and the spectators."],
+            correctAns: 3,
+        }, 
+        {
+            qNumber: "5",
+            q: "'Sok ti' in English is known as: ",
+            answers: ["Spinning elbow", "Elbow slash", "Uppercut", "Roundhouse kick"],
+            correctAns: 1,
+        }, {
+            qNumber: "6",
+            q: "A jumping knee strike in Thai is known as: ",
+            answers: ["'Khayoep teh'", "'Khao dot'", "'Teh tat'", "'Sok tat'", "'Sok klap'"],
+            correctAns: 1,
+        }, {
+            qNumber: "7",
+            q: "The Thai king who codified the modern rules for Muay Thai was: ",
+            answers: ["King Chulalongkorn", "King Naresuan", "King Rama", "King Mangra"],
+            correctAns: 2,
+        }, {
+            qNumber: "8",
+            q: "Muay Thai is often known as: ",
+            answers: ["The way of kicking and jumping, and the fist and hand", "The way of harmonious spirit", "The way of coordinating power", "The art of eight-limbs"],
+            correctAns: 3,
+        }, {
+            qNumber: "9",
+            q: "'Mat wiang klap' in English is a: ",
+            answers: ["Spinning backfist", "Spinning elbow", "Double elow chop", "Superman punch"],
+            correctAns: 0,
+            timerOn: false
+        }
+        ],
+        timer: timerInit,
+        correctCount: 0,
+        wrongCount: 0,
+        userAns: null,
+        answerDisplay: "",
+        display: "INIT", // INIT / QUESTION / INCORRECT / CORRECT / TIMEUP
+        questionIndex: 0
+    };
+}
+var GameState =  makeInitialGameState();
 
 var Timer = {
     startTimer(tickCB) {
@@ -74,14 +77,7 @@ var EventDispatch = {
         // hook up jQuery event listeners to GameLogic functions
         $('#start-btn').on('click', function (e) {
             $(this).hide();
-            console.log("start");
-            GameLogic.displayQuestion();
-            GameState.timerOn = true;
-            //initialize timer
-            GameState.timerInterval = Timer.startTimer(
-                function () {
-                    GameLogic.timerTick();
-                });
+            EventDispatch.start();
         });
 
         // register event handlers for answers clicked
@@ -90,13 +86,30 @@ var EventDispatch = {
             let id = $(this).data('id');
             console.log("Clicked answer id", id);
             GameLogic.gradeAnswer(id);
-        })
+        });
 
         $("#progress-container").on("click", ".next-btn", function(e) {
             console.log("Next Button Clicked");
             GameLogic.displayQuestion();
         });
+        $("#progress-container").on("click", ".restart-btn", function(e) {
+            console.log("Restart Button Clicked");
+            Timer.stopTimer(GameState.timerInterval);
+            GameState = makeInitialGameState();
+            EventDispatch.start();
+            //GameLogic.displayQuestion();
+        });
     },
+    start() {
+        console.log("start");
+        GameLogic.displayQuestion();
+        GameState.timerOn = true;
+        //initialize timer
+        GameState.timerInterval = Timer.startTimer(
+            function () {
+                GameLogic.timerTick();
+            });
+    }
 };
 
 var GameLogic = {
@@ -123,8 +136,6 @@ var GameLogic = {
     },
     updateQuestionIndex() {
         GameState.questionIndex++;
-        console.log(GameState.questionIndex);
-        console.log(GameState.questions.length);
         if(GameState.questionIndex >= GameState.questions.length) {
             // handle questions run out
             console.log("Questions Run Out")
@@ -194,6 +205,7 @@ var DisplayUpdate = {
             DisplayUpdate.eraseAnswers();
             DisplayUpdate.eraseQuestion();
             $("#feedback").text("GAME OVER.");
+            DisplayUpdate.renderRestart();
         }
     },
     renderToolbar() {
@@ -211,6 +223,18 @@ var DisplayUpdate = {
                 class: "btn btn-primary next-btn"
             });
             btn.text("Next Question >>");
+            $("#progress-container").append(btn);
+        }
+    },
+    renderRestart () {
+        if ($("#progress-container .restart-btn").length < 1) {
+            DisplayUpdate.eraseAnswers();
+
+            var btn = $("<a>").attr({
+                type: "button",
+                class: "btn btn-primary restart-btn"
+            });
+            btn.text("Play Again?");
             $("#progress-container").append(btn);
         }
     },
