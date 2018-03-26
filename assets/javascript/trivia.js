@@ -48,9 +48,8 @@ var GameState = {
         answers: ["Spinning backfist", "Spinning elbow", "Double elow chop", "Superman punch"],
         correctAns: 0,
         timerOn: false
-    }, {
-
-    }],
+    }
+    ],
     timer: timerInit,
     correctCount: 0,
     wrongCount: 0,
@@ -113,32 +112,41 @@ var GameLogic = {
         DisplayUpdate.render();
     },
     displayQuestion() {
-        // increment the question number
-        GameState.questionIndex++;
-        if(GameState.questionIndex >= GameState.questions.length) {
-            GameState.questionIndex = 0;
-        }
+            // display question
+            GameState.timer = timerInit;
+            GameState.timerOn = true;
+            GameState.display = "QUESTION";
         
-        GameState.timer = timerInit;
-        GameState.timerOn = true;
-        GameState.display = "QUESTION";
     },
     pauseTimer() {
         GameState.timerOn = false;
     },
+    updateQuestionIndex() {
+        GameState.questionIndex++;
+        console.log(GameState.questionIndex);
+        console.log(GameState.questions.length);
+        if(GameState.questionIndex >= GameState.questions.length) {
+            // handle questions run out
+            console.log("Questions Run Out")
+            GameState.questionIndex = 0;
+            GameState.display = "FINAL";
+            GameLogic.pauseTimer();
+        }
+    },
     gradeAnswer(id) {
         console.log("Grade answer id", id);
         GameState.questions[0].correctAns;
-        if (id === GameState.questions[0].correctAns) {
+        if (id === GameState.questions[GameState.questionIndex].correctAns) {
           GameState.display = "CORRECT";
           GameState.correctCount++;
         }
-        else if (id != GameState.questions[0].correctAns) {
+        else if (id != GameState.questions[GameState.questionIndex].correctAns) {
             GameState.display = "INCORRECT";
             GameState.wrongCount++;
         }
 
         GameLogic.pauseTimer();
+        GameLogic.updateQuestionIndex();
         DisplayUpdate.render();
     }
 
@@ -181,6 +189,12 @@ var DisplayUpdate = {
             $("#feedback").text("Time to answer the question is up");
             DisplayUpdate.renderNextQuestion();
         }
+        else if(display === "FINAL") {
+            DisplayUpdate.renderToolbar();
+            DisplayUpdate.eraseAnswers();
+            DisplayUpdate.eraseQuestion();
+            $("#feedback").text("GAME OVER.");
+        }
     },
     renderToolbar() {
         //update the DOM using jQuery based off GameState
@@ -214,10 +228,9 @@ var DisplayUpdate = {
     },
     renderAnswers() {
         if ($("#ansChoices .btn-choice").length < 1) {
-            var ansArr = GameState.questions[GameState.questionIndex].answers;
+            var ansArr = GameState.questions[GameState.questionIndex].answers || [];
             var btnArr = [];
             console.log(ansArr);
-            console.log(GameState.questions[0].q);
             for (i = 0; i < ansArr.length; i++) {
                 var btn = $("<a>").attr({
                     type: "button",
