@@ -1,5 +1,5 @@
 const $ = jQuery;
-const timerInit = 5;
+const timerInit = 30;
 function makeInitialGameState() {
     return {
         questions: [{
