@@ -1,1 +1,3 @@
 # Trivia-Game
+
+Trivia game with Muay Thai topic. The game begins when the user presses a start button. There is a 30 second time limit for each question that begins when the question is displayed. There is a correct answer and wrong answer counter that is displayed at all times on the screen. A user will choose the button with the answer they believe to be correct, press it, and get the result to their answer. A button for "Next Question" is displayed after their question score is revealed. After the final question (9 in total), a "Game Over" page is displayed along with a button that will allow the user to play again. The game will then restart from the first question.
